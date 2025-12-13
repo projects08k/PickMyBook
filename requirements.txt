@@ -1,0 +1,28 @@
+# NextRead - AI Book Recommendation System
+# Core dependencies for cloud deployment
+
+# Streamlit UI Framework
+streamlit>=1.28.0
+
+# Google Gemini AI (Vision + Text)
+google-generativeai>=0.3.0
+
+# Supabase (Auth + Database)
+supabase>=2.0.0
+
+# HTTP Requests
+requests>=2.31.0
+
+# Natural Language Processing (VADER Sentiment)
+nltk>=3.8.1
+
+# Fuzzy String Matching
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.21.0
+
+# Image Processing
+Pillow>=10.0.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
