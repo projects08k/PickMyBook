@@ -27,30 +27,66 @@ def get_app_url():
     return 'http://localhost:8501'
 
 
-def handle_oauth_tokens():
-    """Check URL for OAuth callback tokens and handle them."""
-    # Get query params from URL fragment (hash)
-    # Supabase sends tokens in the URL fragment after OAuth
-    try:
-        # Check if we have tokens in session from JavaScript redirect
-        if 'oauth_tokens' in st.session_state:
-            tokens = st.session_state.pop('oauth_tokens')
-            result = handle_oauth_callback(
-                tokens.get('access_token'),
-                tokens.get('refresh_token')
-            )
-            if result['success']:
-                st.session_state['page'] = 'home'
-                st.rerun()
-    except Exception as e:
-        st.error(f"OAuth error: {e}")
+def handle_oauth_callback_from_url():
+    """
+    Handle OAuth callback by extracting tokens from URL.
+    Supabase OAuth returns tokens in URL hash, which we need to capture via JavaScript.
+    """
+    # Check for access_token in query params (set by our JavaScript handler)
+    query_params = st.query_params
+    
+    if 'access_token' in query_params:
+        access_token = query_params.get('access_token')
+        refresh_token = query_params.get('refresh_token', '')
+        
+        if access_token:
+            try:
+                from src.auth import handle_oauth_callback
+                result = handle_oauth_callback(access_token, refresh_token)
+                
+                if result['success']:
+                    # Clear the tokens from URL
+                    st.query_params.clear()
+                    st.session_state['page'] = 'home'
+                    st.rerun()
+                else:
+                    st.error(f"Login failed: {result.get('error', 'Unknown error')}")
+                    st.query_params.clear()
+            except Exception as e:
+                st.error(f"OAuth error: {e}")
+                st.query_params.clear()
+    
+    # Add JavaScript to extract tokens from URL hash and redirect with query params
+    # This only runs once when page loads with hash tokens
+    st.markdown('''
+        <script>
+            (function() {
+                // Check if URL has hash with access_token
+                const hash = window.location.hash;
+                if (hash && hash.includes('access_token=')) {
+                    // Parse hash parameters
+                    const params = new URLSearchParams(hash.substring(1));
+                    const accessToken = params.get('access_token');
+                    const refreshToken = params.get('refresh_token');
+                    
+                    if (accessToken) {
+                        // Redirect with tokens as query params (Streamlit can read these)
+                        const baseUrl = window.location.origin + window.location.pathname;
+                        const newUrl = baseUrl + '?access_token=' + encodeURIComponent(accessToken) + 
+                                       '&refresh_token=' + encodeURIComponent(refreshToken || '');
+                        window.location.href = newUrl;
+                    }
+                }
+            })();
+        </script>
+    ''', unsafe_allow_html=True)
 
 
 def render_login_page():
     """Render login/signup page."""
     
     # Handle OAuth callback if present
-    handle_oauth_tokens()
+    handle_oauth_callback_from_url()
     
     if is_authenticated():
         st.session_state['page'] = 'home'
