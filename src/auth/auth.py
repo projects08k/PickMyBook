@@ -106,6 +106,7 @@ def reset_password(email: str) -> Dict[str, Any]:
 def sign_in_with_oauth(provider: str, redirect_url: str) -> Dict[str, Any]:
     """
     Get OAuth sign-in URL for Google or GitHub.
+    Uses implicit flow to avoid PKCE code_verifier issues in serverless environments.
     
     Args:
         provider: 'google' or 'github'
@@ -119,7 +120,8 @@ def sign_in_with_oauth(provider: str, redirect_url: str) -> Dict[str, Any]:
         response = client.auth.sign_in_with_oauth({
             'provider': provider,
             'options': {
-                'redirect_to': redirect_url
+                'redirect_to': redirect_url,
+                'skip_browser_redirect': True,  # Don't auto-redirect, return URL
             }
         })
         return {'success': True, 'url': response.url}
