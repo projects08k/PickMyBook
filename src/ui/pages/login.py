@@ -97,12 +97,25 @@ def _handle_oauth_login(provider: str):
     result = sign_in_with_oauth(provider, app_url)
     
     if result['success'] and result.get('url'):
-        # Redirect to OAuth provider
+        oauth_url = result['url']
+        # Use JavaScript to redirect in new tab or parent window (avoids iframe issues)
         st.markdown(f'''
-            <meta http-equiv="refresh" content="0; url={result['url']}">
-            <script>window.location.href = "{result['url']}";</script>
+            <script>
+                // Try to redirect the parent window (if in iframe)
+                if (window.top !== window.self) {{
+                    window.top.location.href = "{oauth_url}";
+                }} else {{
+                    window.location.href = "{oauth_url}";
+                }}
+            </script>
+            <noscript>
+                <meta http-equiv="refresh" content="0; url={oauth_url}">
+            </noscript>
         ''', unsafe_allow_html=True)
+        
+        # Also show a clickable link as fallback
         st.info(f"Redirecting to {provider.title()}...")
+        st.markdown(f"If not redirected, [click here to login with {provider.title()}]({oauth_url})")
     else:
         st.error(f"Failed to connect to {provider.title()}: {result.get('error', 'Unknown error')}")
 
