@@ -22,7 +22,7 @@ def render_home_page():
     """Render clean home page."""
     
     # Header
-    st.markdown("# NextRead")
+    st.markdown("# 📚 PickMyBook")
     st.caption("AI-powered book recommendations tailored to your mood")
     
     st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)

@@ -1,4 +1,4 @@
-# 📚 NextRead - AI Book Recommendation System
+# 📚 PickMyBook - AI Book Recommendation System
 
 An intelligent ML-powered web application that helps users choose books from their bookshelf using AI vision, mood analysis, and reinforcement learning.
 
@@ -29,8 +29,8 @@ An intelligent ML-powered web application that helps users choose books from the
 
 ```bash
 # Clone repository
-git clone https://github.com/projects08k/NextRead.git
-cd NextRead
+git clone https://github.com/projects08k/PickMyBook.git
+cd PickMyBook
 
 # Create virtual environment
 python -m venv venv
@@ -71,7 +71,7 @@ App opens at `http://localhost:8501`
 ## 🏗️ Project Structure
 
 ```
-NextRead/
+PickMyBook/
 ├── app.py                    # Main Streamlit app
 ├── requirements.txt          # Dependencies
 ├── .env.example             # Environment template

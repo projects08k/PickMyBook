@@ -1,4 +1,4 @@
--- NextRead Database Schema for Supabase
+-- PickMyBook Database Schema for Supabase
 -- Run this in your Supabase SQL Editor (Dashboard → SQL Editor → New Query)
 -- 1. Reading History Table
 CREATE TABLE IF NOT EXISTS reading_history (

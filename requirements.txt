@@ -1,4 +1,4 @@
-# NextRead - AI Book Recommendation System
+# PickMyBook - AI Book Recommendation System
 # Core dependencies for cloud deployment
 
 # Streamlit UI Framework

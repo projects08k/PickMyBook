@@ -1,5 +1,5 @@
 """
-NextRead - Final Polished Theme
+PickMyBook - Final Polished Theme
 Fixes ALL reported issues: consistent placeholders, uniform cards, proper spacing.
 """
 

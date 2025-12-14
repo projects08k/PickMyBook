@@ -1,5 +1,5 @@
 """
-NextRead - AI Book Recommendation System
+PickMyBook - AI Book Recommendation System
 With Multi-User Authentication
 """
 
@@ -25,7 +25,7 @@ from src.auth import is_authenticated, sign_out, get_current_user
 
 
 st.set_page_config(
-    page_title="NextRead",
+    page_title="PickMyBook",
     page_icon="📚",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -52,7 +52,7 @@ def main():
     with st.sidebar:
         st.markdown("""
         <div style="padding: 0.75rem 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06);">
-            <h3 style="margin: 0; font-family: 'Crimson Pro', serif; color: #fafafa;">NextRead</h3>
+            <h3 style="margin: 0; font-family: 'Crimson Pro', serif; color: #fafafa;">📚 PickMyBook</h3>
         </div>
         """, unsafe_allow_html=True)
         

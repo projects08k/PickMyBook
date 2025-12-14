@@ -14,7 +14,7 @@ def render_login_page():
         st.rerun()
         return
     
-    st.markdown("# NextRead")
+    st.markdown("# 📚 PickMyBook")
     st.caption("AI-powered book recommendations")
     
     st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
