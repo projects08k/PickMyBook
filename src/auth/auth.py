@@ -154,3 +154,31 @@ def handle_oauth_callback(access_token: str, refresh_token: str) -> Dict[str, An
             return {'success': False, 'error': 'Failed to set session'}
     except Exception as e:
         return {'success': False, 'error': str(e)}
+
+
+def exchange_code_for_session(code: str) -> Dict[str, Any]:
+    """
+    Exchange OAuth authorization code for a session (PKCE flow).
+    
+    Args:
+        code: Authorization code from OAuth callback
+    
+    Returns:
+        Dict with success status and user info
+    """
+    client = get_client()
+    try:
+        # Exchange the code for a session
+        response = client.auth.exchange_code_for_session({'auth_code': code})
+        
+        if response.user:
+            st.session_state['user'] = {
+                'id': response.user.id,
+                'email': response.user.email,
+                'created_at': str(response.user.created_at)
+            }
+            return {'success': True, 'user': st.session_state['user']}
+        else:
+            return {'success': False, 'error': 'Failed to exchange code for session'}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}

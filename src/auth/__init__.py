@@ -10,7 +10,8 @@ from .auth import (
     sign_out,
     reset_password,
     sign_in_with_oauth,
-    handle_oauth_callback
+    handle_oauth_callback,
+    exchange_code_for_session
 )
 
 __all__ = [
@@ -22,6 +23,8 @@ __all__ = [
     'sign_out',
     'reset_password',
     'sign_in_with_oauth',
-    'handle_oauth_callback'
+    'handle_oauth_callback',
+    'exchange_code_for_session'
 ]
+
 

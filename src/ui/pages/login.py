@@ -29,12 +29,35 @@ def get_app_url():
 
 def handle_oauth_callback_from_url():
     """
-    Handle OAuth callback by extracting tokens from URL.
-    Supabase OAuth returns tokens in URL hash, which we need to capture via JavaScript.
+    Handle OAuth callback by extracting tokens or code from URL.
+    Supabase OAuth can return either:
+    - 'code' parameter (PKCE flow) - needs to be exchanged for session
+    - 'access_token' in hash (implicit flow) - use directly
     """
-    # Check for access_token in query params (set by our JavaScript handler)
     query_params = st.query_params
     
+    # Handle PKCE flow - code parameter
+    if 'code' in query_params:
+        code = query_params.get('code')
+        if code:
+            try:
+                from src.auth import exchange_code_for_session
+                result = exchange_code_for_session(code)
+                
+                if result['success']:
+                    # Clear the code from URL
+                    st.query_params.clear()
+                    st.session_state['page'] = 'home'
+                    st.rerun()
+                else:
+                    st.error(f"Login failed: {result.get('error', 'Unknown error')}")
+                    st.query_params.clear()
+            except Exception as e:
+                st.error(f"OAuth error: {e}")
+                st.query_params.clear()
+        return
+    
+    # Handle implicit flow - access_token in query params (from JS hash extraction)
     if 'access_token' in query_params:
         access_token = query_params.get('access_token')
         refresh_token = query_params.get('refresh_token', '')
@@ -45,7 +68,6 @@ def handle_oauth_callback_from_url():
                 result = handle_oauth_callback(access_token, refresh_token)
                 
                 if result['success']:
-                    # Clear the tokens from URL
                     st.query_params.clear()
                     st.session_state['page'] = 'home'
                     st.rerun()
@@ -55,7 +77,7 @@ def handle_oauth_callback_from_url():
             except Exception as e:
                 st.error(f"OAuth error: {e}")
                 st.query_params.clear()
-        return  # Don't add JS if we already have query params
+        return
     
     # Add JavaScript to extract tokens from URL hash and redirect with query params
     # Uses st.markdown because st.components.v1.html runs in an iframe and can't access parent URL
