@@ -57,29 +57,29 @@ def handle_oauth_callback_from_url():
                 st.query_params.clear()
         return  # Don't add JS if we already have query params
     
-    # Only add JavaScript if we don't already have a session and no query params
-    # This script extracts tokens from URL hash and redirects with query params
-    if not st.session_state.get('oauth_js_added'):
-        st.session_state['oauth_js_added'] = True
-        st.components.v1.html('''
-            <script>
-                (function() {
-                    const hash = window.location.hash;
-                    if (hash && hash.includes('access_token=')) {
-                        const params = new URLSearchParams(hash.substring(1));
-                        const accessToken = params.get('access_token');
-                        const refreshToken = params.get('refresh_token');
-                        
-                        if (accessToken) {
-                            const baseUrl = window.location.origin + window.location.pathname;
-                            const newUrl = baseUrl + '?access_token=' + encodeURIComponent(accessToken) + 
-                                           '&refresh_token=' + encodeURIComponent(refreshToken || '');
-                            window.location.replace(newUrl);
-                        }
+    # Add JavaScript to extract tokens from URL hash and redirect with query params
+    # Uses st.markdown because st.components.v1.html runs in an iframe and can't access parent URL
+    st.markdown('''
+        <script>
+            // Execute immediately to capture OAuth tokens from URL hash
+            (function() {
+                const hash = window.parent.location.hash || window.location.hash;
+                if (hash && hash.includes('access_token=')) {
+                    const params = new URLSearchParams(hash.substring(1));
+                    const accessToken = params.get('access_token');
+                    const refreshToken = params.get('refresh_token');
+                    
+                    if (accessToken) {
+                        // Clear the hash and redirect with query params
+                        const baseUrl = window.parent.location.origin + window.parent.location.pathname;
+                        const newUrl = baseUrl + '?access_token=' + encodeURIComponent(accessToken) + 
+                                       '&refresh_token=' + encodeURIComponent(refreshToken || '');
+                        window.parent.location.replace(newUrl);
                     }
-                })();
-            </script>
-        ''', height=0)
+                }
+            })();
+        </script>
+    ''', unsafe_allow_html=True)
 
 
 def render_login_page():
