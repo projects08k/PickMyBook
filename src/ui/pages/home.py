@@ -88,7 +88,7 @@ def render_home_page():
     _, btn_col, _ = st.columns([1, 2, 1])
     with btn_col:
         st.markdown('<div class="btn-primary">', unsafe_allow_html=True)
-        if st.button("PickMyBook for Me →" if can_go else "Complete both steps", use_container_width=True, disabled=not can_go):
+        if st.button("Find My Perfect Book →" if can_go else "Complete both steps", use_container_width=True, disabled=not can_go):
             st.session_state['page'] = 'results'
             st.session_state['analyzing'] = True
             st.rerun()
