@@ -9,13 +9,21 @@ from src.auth import sign_in, sign_up, is_authenticated, sign_in_with_oauth, han
 # Get the app URL for OAuth redirects
 def get_app_url():
     """Get the current app URL for OAuth redirect."""
-    # For Streamlit Cloud, use the public URL
-    # This will be set automatically in production
     import os
-    # Check if running on Streamlit Cloud
-    if os.getenv('STREAMLIT_RUNTIME_ENV') == 'cloud':
-        # You'll need to set this in your secrets
-        return os.getenv('APP_URL', 'https://your-app.streamlit.app')
+    
+    # Try to get from Streamlit secrets first (for Streamlit Cloud)
+    try:
+        if hasattr(st, 'secrets') and 'APP_URL' in st.secrets:
+            return st.secrets['APP_URL']
+    except:
+        pass
+    
+    # Fallback to environment variable
+    app_url = os.getenv('APP_URL')
+    if app_url:
+        return app_url
+    
+    # Default for local development
     return 'http://localhost:8501'
 
 
