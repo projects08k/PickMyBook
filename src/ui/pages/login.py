@@ -75,20 +75,29 @@ def render_login_page():
             with tab2:
                 _render_signup_form()
         
-        # OAuth buttons
+        # OAuth buttons - Generate URLs and show as link buttons
         st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
         st.markdown("<center>— or continue with —</center>", unsafe_allow_html=True)
         st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
         
+        # Generate OAuth URLs
+        app_url = get_app_url()
+        google_result = sign_in_with_oauth('google', app_url)
+        github_result = sign_in_with_oauth('github', app_url)
+        
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("🔵 Google", use_container_width=True):
-                _handle_oauth_login('google')
+            if google_result['success'] and google_result.get('url'):
+                st.link_button("🔵 Google", google_result['url'], use_container_width=True)
+            else:
+                st.button("🔵 Google (unavailable)", use_container_width=True, disabled=True)
         
         with col2:
-            if st.button("⚫ GitHub", use_container_width=True):
-                _handle_oauth_login('github')
+            if github_result['success'] and github_result.get('url'):
+                st.link_button("⚫ GitHub", github_result['url'], use_container_width=True)
+            else:
+                st.button("⚫ GitHub (unavailable)", use_container_width=True, disabled=True)
         
         # Guest mode
         st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
