@@ -64,7 +64,8 @@ App opens at `http://localhost:8501`
 | `SUPABASE_URL` | ✅ | Supabase project URL |
 | `SUPABASE_ANON_KEY` | ✅ | Supabase anonymous key (public) |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role key (for RL persistence) |
-| `GOOGLE_BOOKS_API_KEY` | ❌ | Optional (Open Library fallback) |
+| `GOOGLE_BOOKS_API_KEY` | ❌ | Optional - Open Library used as fallback |
+| `APP_URL` | ❌ | Your deployed app URL (for Streamlit Cloud) |
 
 > ⚠️ **Security**: Never expose `SUPABASE_SERVICE_ROLE_KEY` in frontend code. It's only used server-side for RL model updates.
 
@@ -79,40 +80,30 @@ PickMyBook/
 │
 ├── src/
 │   ├── auth/                # Supabase authentication
-│   ├── database/            # Supabase repository (cloud-only)
+│   ├── database/            # Supabase repository
 │   ├── vision/              # Gemini book detection
 │   ├── metadata/            # Book metadata (multi-source)
 │   ├── sentiment/           # Mood analysis (VADER NLP)
 │   ├── recommendation/      # Scoring engine
-│   ├── rl/                  # Q-Learning agent (Supabase-backed)
+│   ├── rl/                  # Q-Learning agent
 │   └── ui/                  # Streamlit pages & styles
 ```
 
 ## 🚀 Deployment
 
-### HuggingFace Spaces
-
-1. Create new Space → Select **Streamlit** SDK
-2. Upload files or connect GitHub
-3. Add secrets in **Settings → Variables and secrets**:
-   ```
-   GEMINI_API_KEY=your_key
-   SUPABASE_URL=https://xxx.supabase.co
-   SUPABASE_ANON_KEY=your_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   ```
-
-### Streamlit Cloud
+### Streamlit Cloud (Recommended)
 
 1. Push to GitHub
 2. Connect at [share.streamlit.io](https://share.streamlit.io)
-3. Add secrets in dashboard (Settings → Secrets):
-   ```toml
-   GEMINI_API_KEY = "your_key"
-   SUPABASE_URL = "https://xxx.supabase.co"
-   SUPABASE_ANON_KEY = "your_anon_key"
-   SUPABASE_SERVICE_ROLE_KEY = "your_service_role_key"
-   ```
+3. Add secrets in **Settings → Secrets**:
+
+```toml
+GEMINI_API_KEY = "your_key"
+SUPABASE_URL = "https://xxx.supabase.co"
+SUPABASE_ANON_KEY = "your_anon_key"
+SUPABASE_SERVICE_ROLE_KEY = "your_service_role_key"
+APP_URL = "https://your-app.streamlit.app"
+```
 
 ## 📋 Supabase Setup
 

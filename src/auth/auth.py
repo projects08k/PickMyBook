@@ -101,5 +101,3 @@ def reset_password(email: str) -> Dict[str, Any]:
         return {'success': True, 'message': 'Password reset email sent'}
     except Exception as e:
         return {'success': False, 'error': str(e)}
-
-
