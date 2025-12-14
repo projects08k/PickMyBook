@@ -101,3 +101,56 @@ def reset_password(email: str) -> Dict[str, Any]:
         return {'success': True, 'message': 'Password reset email sent'}
     except Exception as e:
         return {'success': False, 'error': str(e)}
+
+
+def sign_in_with_oauth(provider: str, redirect_url: str) -> Dict[str, Any]:
+    """
+    Get OAuth sign-in URL for Google or GitHub.
+    
+    Args:
+        provider: 'google' or 'github'
+        redirect_url: URL to redirect after OAuth (your app URL)
+    
+    Returns:
+        Dict with 'url' for OAuth redirect or 'error'
+    """
+    client = get_client()
+    try:
+        response = client.auth.sign_in_with_oauth({
+            'provider': provider,
+            'options': {
+                'redirect_to': redirect_url
+            }
+        })
+        return {'success': True, 'url': response.url}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
+
+
+def handle_oauth_callback(access_token: str, refresh_token: str) -> Dict[str, Any]:
+    """
+    Handle OAuth callback and set user session.
+    
+    Args:
+        access_token: JWT access token from OAuth callback
+        refresh_token: Refresh token from OAuth callback
+    
+    Returns:
+        Dict with success status and user info
+    """
+    client = get_client()
+    try:
+        # Set the session with the tokens from OAuth callback
+        response = client.auth.set_session(access_token, refresh_token)
+        
+        if response.user:
+            st.session_state['user'] = {
+                'id': response.user.id,
+                'email': response.user.email,
+                'created_at': str(response.user.created_at)
+            }
+            return {'success': True, 'user': st.session_state['user']}
+        else:
+            return {'success': False, 'error': 'Failed to set session'}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}

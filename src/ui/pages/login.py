@@ -3,11 +3,46 @@ Login Page - User Authentication
 """
 
 import streamlit as st
-from src.auth import sign_in, sign_up, is_authenticated
+from urllib.parse import urlparse, parse_qs
+from src.auth import sign_in, sign_up, is_authenticated, sign_in_with_oauth, handle_oauth_callback
+
+# Get the app URL for OAuth redirects
+def get_app_url():
+    """Get the current app URL for OAuth redirect."""
+    # For Streamlit Cloud, use the public URL
+    # This will be set automatically in production
+    import os
+    # Check if running on Streamlit Cloud
+    if os.getenv('STREAMLIT_RUNTIME_ENV') == 'cloud':
+        # You'll need to set this in your secrets
+        return os.getenv('APP_URL', 'https://your-app.streamlit.app')
+    return 'http://localhost:8501'
+
+
+def handle_oauth_tokens():
+    """Check URL for OAuth callback tokens and handle them."""
+    # Get query params from URL fragment (hash)
+    # Supabase sends tokens in the URL fragment after OAuth
+    try:
+        # Check if we have tokens in session from JavaScript redirect
+        if 'oauth_tokens' in st.session_state:
+            tokens = st.session_state.pop('oauth_tokens')
+            result = handle_oauth_callback(
+                tokens.get('access_token'),
+                tokens.get('refresh_token')
+            )
+            if result['success']:
+                st.session_state['page'] = 'home'
+                st.rerun()
+    except Exception as e:
+        st.error(f"OAuth error: {e}")
 
 
 def render_login_page():
     """Render login/signup page."""
+    
+    # Handle OAuth callback if present
+    handle_oauth_tokens()
     
     if is_authenticated():
         st.session_state['page'] = 'home'
@@ -32,6 +67,21 @@ def render_login_page():
             with tab2:
                 _render_signup_form()
         
+        # OAuth buttons
+        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<center>— or continue with —</center>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🔵 Google", use_container_width=True):
+                _handle_oauth_login('google')
+        
+        with col2:
+            if st.button("⚫ GitHub", use_container_width=True):
+                _handle_oauth_login('github')
+        
         # Guest mode
         st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
         st.caption("Or continue without account (data won't be saved)")
@@ -39,6 +89,22 @@ def render_login_page():
             st.session_state['user'] = {'id': 'guest', 'email': 'guest', 'guest': True}
             st.session_state['page'] = 'home'
             st.rerun()
+
+
+def _handle_oauth_login(provider: str):
+    """Handle OAuth login redirect."""
+    app_url = get_app_url()
+    result = sign_in_with_oauth(provider, app_url)
+    
+    if result['success'] and result.get('url'):
+        # Redirect to OAuth provider
+        st.markdown(f'''
+            <meta http-equiv="refresh" content="0; url={result['url']}">
+            <script>window.location.href = "{result['url']}";</script>
+        ''', unsafe_allow_html=True)
+        st.info(f"Redirecting to {provider.title()}...")
+    else:
+        st.error(f"Failed to connect to {provider.title()}: {result.get('error', 'Unknown error')}")
 
 
 def _render_signin_form():

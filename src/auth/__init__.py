@@ -8,7 +8,9 @@ from .auth import (
     sign_up,
     sign_in,
     sign_out,
-    reset_password
+    reset_password,
+    sign_in_with_oauth,
+    handle_oauth_callback
 )
 
 __all__ = [
@@ -18,5 +20,8 @@ __all__ = [
     'sign_up',
     'sign_in',
     'sign_out',
-    'reset_password'
+    'reset_password',
+    'sign_in_with_oauth',
+    'handle_oauth_callback'
 ]
+
